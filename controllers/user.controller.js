@@ -1,12 +1,14 @@
 import bcrypt from "bcryptjs"
 import expressAsyncHandler from "express-async-handler";
 import User from "../models/user.model.js"
+import { generateToken } from "../utils/jwtHandler.util.js";
+import { getTokenFromHeader } from "../utils/jwtHandler.util.js";
+import { verifyToken } from "../utils/jwtHandler.util.js";
 
 
 // @desc Register user
 // @route POST /api/v1/users/register
 // @access Private/Admin
-
 export const registerUserCtrl = expressAsyncHandler(
     async (req, res) => {
         const {fullname, email, password} = req.body;
@@ -42,7 +44,6 @@ export const registerUserCtrl = expressAsyncHandler(
 // @desc Login user
 // @route POST /api/v1/users/login
 // @access Public
-
 export const loginUserCtrl = expressAsyncHandler(
     async(req, res) => {
         const {email, password} = req.body;
@@ -53,6 +54,7 @@ export const loginUserCtrl = expressAsyncHandler(
                 status:"success",
                 message:"User Login Successfully",
                 userFound,
+                token: generateToken(userFound?._id)
             })
         }else{
             throw new Error("Invalid Credentials")
@@ -63,3 +65,14 @@ export const loginUserCtrl = expressAsyncHandler(
     }
 )
 
+// @desc Get user profile
+// @route POST /api/v1/users/profile
+// @access Private
+export const getUserProfileCtrl = expressAsyncHandler(
+    async(req, res) => {
+        console.log(req?.userAuthId);
+        res.json({
+            msg: "Loading User Profile..."
+        })
+    }
+)
