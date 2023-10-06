@@ -1,9 +1,8 @@
-import bcrypt from "bcryptjs"
+import bcrypt from "bcryptjs";
 import expressAsyncHandler from "express-async-handler";
-import User from "../models/user.model.js"
+import User from "../models/user.model.js";
 import { generateToken } from "../utils/jwtHandler.util.js";
-import { getTokenFromHeader } from "../utils/jwtHandler.util.js";
-import { verifyToken } from "../utils/jwtHandler.util.js";
+import { matchedData, validationResult } from "express-validator";
 
 
 // @desc Register user
@@ -11,12 +10,22 @@ import { verifyToken } from "../utils/jwtHandler.util.js";
 // @access Private/Admin
 export const registerUserCtrl = expressAsyncHandler(
     async (req, res) => {
-        const {fullname, email, password} = req.body;
-    
+
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            // validationResult(req).throw();
+            const error = new Error("Field Validation Failed")
+            error.statusCode = 422
+            error.source = errors.array()
+            throw error
+        }
+
+        const { fullname, email, password } = matchedData(req) // req.body;
+
         // Check user exits
         const userExists = await User.findOne({ email });
         if (userExists) {
-            
+
             let err = new Error("User already exists")
             err.statusCode = 409
             throw err
@@ -34,8 +43,8 @@ export const registerUserCtrl = expressAsyncHandler(
             password: hashedPassword,
         });
         res.status(201).json({
-            status:"success",
-            message:"User Registered Successfully",
+            status: "success",
+            message: "User Registered Successfully",
             data: user,
         })
     }
@@ -45,18 +54,29 @@ export const registerUserCtrl = expressAsyncHandler(
 // @route POST /api/v1/users/login
 // @access Public
 export const loginUserCtrl = expressAsyncHandler(
-    async(req, res) => {
-        const {email, password} = req.body;
+    async (req, res) => {
+
+        const errors = validationResult(req);
+        // console.log(errors)
+        if (!errors.isEmpty()) {
+            // validationResult(req).throw();
+            const error = new Error("Field Validation Failed")
+            error.statusCode = 422
+            error.source = errors.array()
+            throw error
+        }
+
+        const { email, password } = req.body;
         // Find the user in db by email only
-        const userFound = await User.findOne({email,})
-        if(userFound && await bcrypt.compare(password, userFound?.password)){
+        const userFound = await User.findOne({ email, })
+        if (userFound && await bcrypt.compare(password, userFound?.password)) {
             return res.json({
-                status:"success",
-                message:"User Login Successfully",
+                status: "success",
+                message: "User Login Successfully",
                 userFound,
                 token: generateToken(userFound?._id)
             })
-        }else{
+        } else {
             throw new Error("Invalid Credentials")
             // res.json({
             //     msg: "Invalid Credentials"
@@ -69,7 +89,7 @@ export const loginUserCtrl = expressAsyncHandler(
 // @route POST /api/v1/users/profile
 // @access Private
 export const getUserProfileCtrl = expressAsyncHandler(
-    async(req, res) => {
+    async (req, res) => {
         console.log(req?.userAuthId);
         res.json({
             msg: "Loading User Profile..."
