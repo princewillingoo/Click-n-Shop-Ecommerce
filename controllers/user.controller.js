@@ -66,7 +66,7 @@ export const loginUserCtrl = expressAsyncHandler(
             throw error
         }
 
-        const { email, password } = req.body;
+        const { email, password } = matchedData(req) // req.body;
         // Find the user in db by email only
         const userFound = await User.findOne({ email, })
         if (userFound && await bcrypt.compare(password, userFound?.password)) {
@@ -77,7 +77,9 @@ export const loginUserCtrl = expressAsyncHandler(
                 token: generateToken(userFound?._id)
             })
         } else {
-            throw new Error("Invalid Credentials")
+            const error = new Error("Invalid Credentials")
+            error.statusCode = 401
+            throw error
             // res.json({
             //     msg: "Invalid Credentials"
             // })
