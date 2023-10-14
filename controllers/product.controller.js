@@ -1,7 +1,7 @@
 import expressAsyncHandler from "express-async-handler";
 import Product from "../models/product.model.js";
 import { matchedData, validationResult } from "express-validator";
-
+import Category from "../models/category.model.js"
 
 // @desc Create new product
 // @route POST /api/v1/products
@@ -29,6 +29,14 @@ export const createProductCtrl = expressAsyncHandler(
             throw err
         }
 
+        //find the category
+        const categoryFound = await Category.findOne({ name: category, })
+        if (!categoryFound) {
+            let err = new Error("Category Not Found")
+            err.statusCode = 404
+            throw err
+        }
+
         // Create the product
         const product = await Product.create({
             name,
@@ -41,7 +49,11 @@ export const createProductCtrl = expressAsyncHandler(
             price,
             totalQty,
         });
+
         // Push the product into category
+        categoryFound.products.push(product._id)
+        // resave
+        await categoryFound.save();
 
         //send response
         res.status(201).json({
