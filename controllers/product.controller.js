@@ -2,6 +2,8 @@ import expressAsyncHandler from "express-async-handler";
 import Product from "../models/product.model.js";
 import { matchedData, validationResult } from "express-validator";
 import Category from "../models/category.model.js"
+import Brand from "../models/brand.model.js";
+
 
 // @desc Create new product
 // @route POST /api/v1/products
@@ -26,6 +28,14 @@ export const createProductCtrl = expressAsyncHandler(
         if (productExists) {
             let err = new Error("Product Already Exists")
             err.statusCode = 403
+            throw err
+        }
+
+        //find the brand
+        const brandFound = await Brand.findOne({ name: brand.toLowerCase(), })
+        if (!brandFound) {
+            let err = new Error("Brand Not Found")
+            err.statusCode = 404
             throw err
         }
 
@@ -54,6 +64,11 @@ export const createProductCtrl = expressAsyncHandler(
         categoryFound.products.push(product._id)
         // resave
         await categoryFound.save();
+
+        // Push the product into brand
+        brandFound.products.push(product._id)
+        // resave
+        await brandFound.save();
 
         //send response
         res.status(201).json({

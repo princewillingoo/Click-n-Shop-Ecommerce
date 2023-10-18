@@ -1,23 +1,23 @@
 import expressAsyncHandler from "express-async-handler";
-import Category from "../models/category.model.js";
+import Color from "../models/color.model.js";
 
-// @desc Create new category
-// @route Post /api/v1/categories
+// @desc Create new color
+// @route Post /api/v1/colors
 // access Private/Admin
-export const createCategoryCtrl = expressAsyncHandler(
+export const createColorCtrl = expressAsyncHandler(
     async (req, res) => {
         const { name } = req.body;
 
-        //category exists
-        const categoryFound = await Category.findOne({name})
-        if(categoryFound){
-            let exception = new Error("Category already exists")
+        //color exists
+        const colorFound = await Color.findOne({name})
+        if(colorFound){
+            let exception = new Error("Color already exists")
             exception.statusCode = 409
             throw exception
         }
 
         // create
-        const category = await Category.create({
+        const color = await Color.create({
 
             name: name.toLowerCase(),
             user: req.userAuthId,
@@ -25,51 +25,50 @@ export const createCategoryCtrl = expressAsyncHandler(
 
         res.status(201).json({
             status: "success",
-            message: "Category created successfully",
-            category,
+            message: "Color created successfully",
+            color,
         });
     }
 );
 
 
-// @desc Get all categories
-// @route Get /api/v1/categories
+// @desc Get all colors
+// @route Get /api/v1/colors
 // access Public
-export const getAllCategoriesCtrl = expressAsyncHandler(
+export const getAllColorsCtrl = expressAsyncHandler(
+    async (req, res) => {
+        const colors = await Color.find();
+
+        res.status(200).json({
+            status: "Success",
+            message: "Colors fetched successfully",
+            colors,
+        });
+    }
+);
+
+
+// @desc Get single color
+// @route Get /api/v1/colors/:id
+// access Public
+export const getSingleColorCtrl = expressAsyncHandler(
     async (req, res) => {
 
-        const categories = await Category.find();
+        const color = await Color.findById(req.params.id);
 
         res.status(200).json({
             status: "success",
-            message: "Categories fetched successfully",
-            categories,
+            message: "Color fetched successfully",
+            color,
         });
     }
 );
 
 
-// @desc Get single category
-// @route Get /api/v1/categories/:id
-// access Public
-export const getSingleCategoryCtrl = expressAsyncHandler(
-    async (req, res) => {
-
-        const category = await Category.findById(req.params.id);
-
-        res.status(200).json({
-            status: "success",
-            message: "Category fetched successfully",
-            category,
-        });
-    }
-);
-
-
-// @desc Update category
-// @route Put /api/v1/categories/:id
+// @desc Update color
+// @route Put /api/v1/colors/:id
 // access Private/Admin
-export const updateCategoryCtrl = expressAsyncHandler(
+export const updateColorCtrl = expressAsyncHandler(
     async (req, res) => {
 
         // // Schema Validation
@@ -86,25 +85,21 @@ export const updateCategoryCtrl = expressAsyncHandler(
         const { name } = req.body // matchedData(req);
 
         // Update
-        const category = await Category.findByIdAndUpdate(
-            req.params.id, 
-            { name }, 
-            { new: true }
-        )
+        const color = await Color.findByIdAndUpdate(req.params.id, { name }, { new: true })
 
         res.json({
             status: "Success",
-            message: "Category updated successfully",
-            category,
+            message: "Color updated successfully",
+            color,
         })
     }
 )
 
 
-// @desc Delete category
-// @route DELETE /api/v1/categories/:id/delete
+// @desc Delete color
+// @route DELETE /api/v1/colors/:id/delete
 // @access Private/Admin
-export const deleteCategoryCtrl = expressAsyncHandler(
+export const deleteColorCtrl = expressAsyncHandler(
     async (req, res) => {
 
         // const errors = validationResult(req);
@@ -117,11 +112,11 @@ export const deleteCategoryCtrl = expressAsyncHandler(
         // }
 
         // const { id } = matchedData(req)
-        await Category.findByIdAndDelete(req.params.id)
+        await Color.findByIdAndDelete(req.params.id)
 
         res.status(204).json({
             status: "Success",
-            message: "Category deleted successfully",
+            message: "Color deleted successfully",
         })
     }
 )

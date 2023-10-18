@@ -1,23 +1,23 @@
 import expressAsyncHandler from "express-async-handler";
-import Category from "../models/category.model.js";
+import Brand from "../models/brand.model.js";
 
-// @desc Create new category
-// @route Post /api/v1/categories
+// @desc Create new brand
+// @route Post /api/v1/brands
 // access Private/Admin
-export const createCategoryCtrl = expressAsyncHandler(
+export const createBrandCtrl = expressAsyncHandler(
     async (req, res) => {
         const { name } = req.body;
 
-        //category exists
-        const categoryFound = await Category.findOne({name})
-        if(categoryFound){
-            let exception = new Error("Category already exists")
+        //brand exists
+        const brandFound = await Brand.findOne({name})
+        if(brandFound){
+            let exception = new Error("Brand already exists")
             exception.statusCode = 409
             throw exception
         }
 
         // create
-        const category = await Category.create({
+        const brand = await Brand.create({
 
             name: name.toLowerCase(),
             user: req.userAuthId,
@@ -25,51 +25,50 @@ export const createCategoryCtrl = expressAsyncHandler(
 
         res.status(201).json({
             status: "success",
-            message: "Category created successfully",
-            category,
+            message: "Brand created successfully",
+            brand,
         });
     }
 );
 
 
-// @desc Get all categories
-// @route Get /api/v1/categories
+// @desc Get all brands
+// @route Get /api/v1/brands
 // access Public
-export const getAllCategoriesCtrl = expressAsyncHandler(
+export const getAllBrandsCtrl = expressAsyncHandler(
+    async (req, res) => {
+        const brands = await Brand.find();
+
+        res.status(200).json({
+            status: "Success",
+            message: "Brands fetched successfully",
+            brands,
+        });
+    }
+);
+
+
+// @desc Get single brand
+// @route Get /api/v1/brands/:id
+// access Public
+export const getSingleBrandCtrl = expressAsyncHandler(
     async (req, res) => {
 
-        const categories = await Category.find();
+        const brand = await Brand.findById(req.params.id);
 
         res.status(200).json({
             status: "success",
-            message: "Categories fetched successfully",
-            categories,
+            message: "Brand fetched successfully",
+            brand,
         });
     }
 );
 
 
-// @desc Get single category
-// @route Get /api/v1/categories/:id
-// access Public
-export const getSingleCategoryCtrl = expressAsyncHandler(
-    async (req, res) => {
-
-        const category = await Category.findById(req.params.id);
-
-        res.status(200).json({
-            status: "success",
-            message: "Category fetched successfully",
-            category,
-        });
-    }
-);
-
-
-// @desc Update category
-// @route Put /api/v1/categories/:id
+// @desc Update brand
+// @route Put /api/v1/brands/:id
 // access Private/Admin
-export const updateCategoryCtrl = expressAsyncHandler(
+export const updateBrandCtrl = expressAsyncHandler(
     async (req, res) => {
 
         // // Schema Validation
@@ -86,25 +85,21 @@ export const updateCategoryCtrl = expressAsyncHandler(
         const { name } = req.body // matchedData(req);
 
         // Update
-        const category = await Category.findByIdAndUpdate(
-            req.params.id, 
-            { name }, 
-            { new: true }
-        )
+        const brand = await Brand.findByIdAndUpdate(req.params.id, { name }, { new: true })
 
         res.json({
             status: "Success",
-            message: "Category updated successfully",
-            category,
+            message: "Brand updated successfully",
+            brand,
         })
     }
 )
 
 
-// @desc Delete category
-// @route DELETE /api/v1/categories/:id/delete
+// @desc Delete brand
+// @route DELETE /api/v1/brands/:id/delete
 // @access Private/Admin
-export const deleteCategoryCtrl = expressAsyncHandler(
+export const deleteBrandCtrl = expressAsyncHandler(
     async (req, res) => {
 
         // const errors = validationResult(req);
@@ -117,11 +112,11 @@ export const deleteCategoryCtrl = expressAsyncHandler(
         // }
 
         // const { id } = matchedData(req)
-        await Category.findByIdAndDelete(req.params.id)
+        await Brand.findByIdAndDelete(req.params.id)
 
         res.status(204).json({
             status: "Success",
-            message: "Category deleted successfully",
+            message: "Brand deleted successfully",
         })
     }
 )
