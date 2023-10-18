@@ -1,12 +1,25 @@
 import expressAsyncHandler from "express-async-handler";
 import Color from "../models/color.model.js";
+import { matchedData, validationResult } from "express-validator";
+
 
 // @desc Create new color
 // @route Post /api/v1/colors
 // access Private/Admin
 export const createColorCtrl = expressAsyncHandler(
     async (req, res) => {
-        const { name } = req.body;
+        
+        // Schema Validation
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            // validationResult(req).throw();
+            let error = new Error("Field Validation Failed")
+            error.statusCode = 422
+            error.source = errors.array()
+            throw error
+        }
+                
+        const { name } =  matchedData(req) // req.body;
 
         //color exists
         const colorFound = await Color.findOne({name})
@@ -37,6 +50,7 @@ export const createColorCtrl = expressAsyncHandler(
 // access Public
 export const getAllColorsCtrl = expressAsyncHandler(
     async (req, res) => {
+
         const colors = await Color.find();
 
         res.status(200).json({
@@ -54,7 +68,18 @@ export const getAllColorsCtrl = expressAsyncHandler(
 export const getSingleColorCtrl = expressAsyncHandler(
     async (req, res) => {
 
-        const color = await Color.findById(req.params.id);
+        // Schema Validation
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            // validationResult(req).throw();
+            let error = new Error("Field Validation Failed")
+            error.statusCode = 422
+            error.source = errors.array()
+            throw error
+        }
+        
+        const { id } = matchedData(req)
+        const color = await Color.findById(id);
 
         res.status(200).json({
             status: "success",
@@ -71,21 +96,20 @@ export const getSingleColorCtrl = expressAsyncHandler(
 export const updateColorCtrl = expressAsyncHandler(
     async (req, res) => {
 
-        // // Schema Validation
-        // const errors = validationResult(req);
-        // if (!errors.isEmpty()) {
-        //     // validationResult(req).throw();
-        //     let error = new Error("Field Validation Failed")
-        //     error.statusCode = 422
-        //     error.source = errors.array()
-        //     throw error
-        // }
+        // Schema Validation
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            // validationResult(req).throw();
+            let error = new Error("Field Validation Failed")
+            error.statusCode = 422
+            error.source = errors.array()
+            throw error
+        }
 
-
-        const { name } = req.body // matchedData(req);
+        const { id, name } = matchedData(req); // req.body // 
 
         // Update
-        const color = await Color.findByIdAndUpdate(req.params.id, { name }, { new: true })
+        const color = await Color.findByIdAndUpdate(id, { name }, { new: true })
 
         res.json({
             status: "Success",
@@ -102,17 +126,17 @@ export const updateColorCtrl = expressAsyncHandler(
 export const deleteColorCtrl = expressAsyncHandler(
     async (req, res) => {
 
-        // const errors = validationResult(req);
-        // if (!errors.isEmpty()) {
-        //     // validationResult(req).throw();
-        //     let error = new Error("Field Validation Failed")
-        //     error.statusCode = 422
-        //     error.source = errors.array()
-        //     throw error
-        // }
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            // validationResult(req).throw();
+            let error = new Error("Field Validation Failed")
+            error.statusCode = 422
+            error.source = errors.array()
+            throw error
+        }
 
-        // const { id } = matchedData(req)
-        await Color.findByIdAndDelete(req.params.id)
+        const { id } = matchedData(req)
+        await Color.findByIdAndDelete(id)
 
         res.status(204).json({
             status: "Success",

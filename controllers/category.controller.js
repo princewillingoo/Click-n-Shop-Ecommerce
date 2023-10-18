@@ -1,12 +1,24 @@
 import expressAsyncHandler from "express-async-handler";
 import Category from "../models/category.model.js";
+import { matchedData, validationResult } from "express-validator";
 
 // @desc Create new category
 // @route Post /api/v1/categories
 // access Private/Admin
 export const createCategoryCtrl = expressAsyncHandler(
     async (req, res) => {
-        const { name } = req.body;
+
+        // Schema Validation
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            // validationResult(req).throw();
+            let error = new Error("Field Validation Failed")
+            error.statusCode = 422
+            error.source = errors.array()
+            throw error
+        }
+        
+        const { name } =  matchedData(req) // req.body;
 
         //category exists
         const categoryFound = await Category.findOne({name})
@@ -18,7 +30,6 @@ export const createCategoryCtrl = expressAsyncHandler(
 
         // create
         const category = await Category.create({
-
             name: name.toLowerCase(),
             user: req.userAuthId,
         });
@@ -55,7 +66,19 @@ export const getAllCategoriesCtrl = expressAsyncHandler(
 export const getSingleCategoryCtrl = expressAsyncHandler(
     async (req, res) => {
 
-        const category = await Category.findById(req.params.id);
+        // Schema Validation
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            // validationResult(req).throw();
+            let error = new Error("Field Validation Failed")
+            error.statusCode = 422
+            error.source = errors.array()
+            throw error
+        }
+
+        const { id } = matchedData(req)
+
+        const category = await Category.findById(id);
 
         res.status(200).json({
             status: "success",
@@ -72,24 +95,22 @@ export const getSingleCategoryCtrl = expressAsyncHandler(
 export const updateCategoryCtrl = expressAsyncHandler(
     async (req, res) => {
 
-        // // Schema Validation
-        // const errors = validationResult(req);
-        // if (!errors.isEmpty()) {
-        //     // validationResult(req).throw();
-        //     let error = new Error("Field Validation Failed")
-        //     error.statusCode = 422
-        //     error.source = errors.array()
-        //     throw error
-        // }
+        // Schema Validation
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            // validationResult(req).throw();
+            let error = new Error("Field Validation Failed")
+            error.statusCode = 422
+            error.source = errors.array()
+            throw error
+        }
 
 
-        const { name } = req.body // matchedData(req);
+        const { id, name } =  matchedData(req); // req.body //
 
         // Update
         const category = await Category.findByIdAndUpdate(
-            req.params.id, 
-            { name }, 
-            { new: true }
+            id, { name }, { new: true }
         )
 
         res.json({
@@ -107,17 +128,17 @@ export const updateCategoryCtrl = expressAsyncHandler(
 export const deleteCategoryCtrl = expressAsyncHandler(
     async (req, res) => {
 
-        // const errors = validationResult(req);
-        // if (!errors.isEmpty()) {
-        //     // validationResult(req).throw();
-        //     let error = new Error("Field Validation Failed")
-        //     error.statusCode = 422
-        //     error.source = errors.array()
-        //     throw error
-        // }
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            // validationResult(req).throw();
+            let error = new Error("Field Validation Failed")
+            error.statusCode = 422
+            error.source = errors.array()
+            throw error
+        }
 
-        // const { id } = matchedData(req)
-        await Category.findByIdAndDelete(req.params.id)
+        const { id } = matchedData(req)
+        await Category.findByIdAndDelete(id)
 
         res.status(204).json({
             status: "Success",
