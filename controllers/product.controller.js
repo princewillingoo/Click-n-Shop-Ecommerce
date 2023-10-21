@@ -167,7 +167,7 @@ export const getProductsCtrl = expressAsyncHandler(
         }
 
         // await the Query
-        const products = await productQuery; // Note; await ends the query
+        const products = await productQuery.populate('reviews'); // Note; await ends the query
 
         res.json({
             status: "Success",
@@ -197,7 +197,7 @@ export const getProductCtrl = expressAsyncHandler(
         }
 
         const { id } = matchedData(req)
-        const product = await Product.findById(id)
+        const product = await Product.findById(id).populate('reviews');
 
         if (!product) {
             let error = new Error("Product not found")
