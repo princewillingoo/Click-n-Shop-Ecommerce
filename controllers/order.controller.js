@@ -146,6 +146,28 @@ export const getSingleOrderCtrl = expressAsyncHandler(
     }
 )
 
+//@desc update order to status
+//@route PUT /api/v1/orders/update/:id
+//@access private/admin
+export const updateOrderCtrl = expressAsyncHandler(
+    async (req, res) => {
+        // get id from params
+        const id = req.params.id;
+
+        // update
+        const updatedOrder = await Order.findByIdAndUpdate(
+            id,
+            { status: req.body.status },
+            { new: true },
+        );
+
+        res.status(200).json({
+            success: true,
+            message: "Order updated",
+            updatedOrder,
+        });
+    }
+);
 
 export const paymentSuccess = expressAsyncHandler(
     async (req, res) => {

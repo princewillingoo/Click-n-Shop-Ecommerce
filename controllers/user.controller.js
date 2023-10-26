@@ -92,9 +92,12 @@ export const loginUserCtrl = expressAsyncHandler(
 // @access Private
 export const getUserProfileCtrl = expressAsyncHandler(
     async (req, res) => {
-        console.log(req?.userAuthId);
+        const user = await User.findById(req.userAuthId).populate("orders");
+
         res.json({
-            msg: "Loading User Profile..."
+            status: "success",
+            message: "User profile fetched successfully",
+            user
         })
     }
 )
