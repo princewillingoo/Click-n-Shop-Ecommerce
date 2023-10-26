@@ -64,6 +64,11 @@ const ProductSchema = mongoose.Schema(
     }
 );
 
+// quantity left
+ProductSchema.virtual('quantityLeft').get(function(){
+    return this.totalQty - this.totalSold;
+})
+// reviews
 ProductSchema.virtual("totalReviews").get(function(){
     const product = this;
     return product?.reviews?.length;

@@ -21,7 +21,7 @@ export const createProductCtrl = expressAsyncHandler(
             throw error
         }
 
-        const { name, description, category, brand, sizes, colors, price, totalQty } = matchedData(req)  // req.body;
+        const { name, description, category, brand, sizes, colors, price, totalQty } = query(req)  // req.body;
 
         // Product exists
         const productExists = await Product.findOne({ name });
@@ -96,55 +96,57 @@ export const getProductsCtrl = expressAsyncHandler(
             throw error
         }
 
+        const query = matchedData(req);
+
         // Query
         let productQuery = Product.find();
 
         // find by name
-        if (matchedData.name) {
+        if (query.name) {
             productQuery = productQuery.find({
-                name: { $regex: matchedData.name, $options: "i" }
+                name: { $regex: query.name, $options: "i" }
             });
         }
 
         // find by brand
-        if (matchedData.brand) {
+        if (query.brand) {
             productQuery = productQuery.find({
-                brand: { $regex: matchedData.brand, $options: "i" }
+                brand: { $regex: query.brand, $options: "i" }
             });
         }
 
         // find by category
-        if (matchedData.category) {
+        if (query.category) {
             productQuery = productQuery.find({
-                category: { $regex: matchedData.category, $options: "i" }
+                category: { $regex: query.category, $options: "i" }
             });
         }
 
         // find by colors
-        if (matchedData.colors) {
+        if (query.colors) {
             productQuery = productQuery.find({
-                colors: { $regex: matchedData.colors, $options: "i" }
+                colors: { $regex: query.colors, $options: "i" }
             });
         }
 
         // find by sizes
-        if (matchedData.sizes) {
+        if (query.sizes) {
             productQuery = productQuery.find({
-                sizes: { $regex: matchedData.sizes, $options: "i" }
+                sizes: { $regex: query.sizes, $options: "i" }
             });
         }
 
         // find by price range
-        if (matchedData.price) {
-            const priceRange = matchedData.price.split("-")
+        if (query.price) {
+            const priceRange = query.price.split("-")
             productQuery = productQuery.find({
                 price: { $gte: priceRange[0], $lte: priceRange[1] },
             });
         }
 
         // pagination
-        const page = parseInt(matchedData.page) ? parseInt(matchedData.page) : 1; // page
-        const limit = parseInt(matchedData.limit) ? parseInt(matchedData.limit) : 10; // limit
+        const page = parseInt(query.page) ? parseInt(query.page) : 1; // page
+        const limit = parseInt(query.limit) ? parseInt(query.limit) : 10; // limit
         const startIndex = (page - 1) * limit; // startIndex
         const endIndex = (page) * limit; // endIndex
         const total = await Product.countDocuments(); // total
@@ -175,7 +177,7 @@ export const getProductsCtrl = expressAsyncHandler(
             results: products.length,
             pagination,
             message: "Product fetched seccessfully",
-            products
+            products,
         });
     }
 );
@@ -196,7 +198,7 @@ export const getProductCtrl = expressAsyncHandler(
             throw error
         }
 
-        const { id } = matchedData(req)
+        const { id } = query(req)
         const product = await Product.findById(id).populate('reviews');
 
         if (!product) {
@@ -231,7 +233,7 @@ export const updateProductCtrl = expressAsyncHandler(
         }
 
 
-        const { id, name, description, category, brand, sizes, colors, price, totalQty } = matchedData(req)  // req.body;
+        const { id, name, description, category, brand, sizes, colors, price, totalQty } = query(req)  // req.body;
 
         //Update
         const product = await Product.findByIdAndUpdate(id, {
@@ -262,7 +264,7 @@ export const deleteProductCtrl = expressAsyncHandler(
             throw error
         }
 
-        const { id } = matchedData(req)
+        const { id } = query(req)
         await Product.findByIdAndDelete(id)
 
         res.status(204).json({

@@ -1,5 +1,5 @@
 export const globalErrHandler = (err, req, res, next) => {
-
+    console.log(err.message)
     // stack, statusCode, source
     const stack = err?.stack;
     const statusCode = err?.statusCode ? err?.statusCode : 500;

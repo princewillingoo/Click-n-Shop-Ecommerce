@@ -1,9 +1,8 @@
 import express from "express";
-import { registerUserCtrl, loginUserCtrl, getUserProfileCtrl } from "../controllers/user.controller.js";
+import { registerUserCtrl, loginUserCtrl, getUserProfileCtrl, updateShippingAddressCtrl } from "../controllers/user.controller.js";
 import { isLoggedIn } from "../middlewares/isLoggedIn.middleware.js";
 
 import { checkExact, checkSchema, body } from "express-validator";
-
 
 const userRoutes = express.Router();
 
@@ -27,5 +26,6 @@ userRoutes.post(
 );
 
 userRoutes.get("/profile", isLoggedIn, getUserProfileCtrl);
+userRoutes.get("/address", isLoggedIn, updateShippingAddressCtrl);
 
 export default userRoutes;
