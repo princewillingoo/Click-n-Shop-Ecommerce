@@ -5,6 +5,7 @@ import Product from "../models/product.model.js";
 import axios from "axios";
 import dotenv from "dotenv";
 import crypto from "crypto"
+import { matchedData, validationResult } from "express-validator";
 
 dotenv.config()
 
@@ -13,8 +14,17 @@ dotenv.config()
 //@access private
 export const createOrderCtrl = expressAsyncHandler(
     async (req, res) => {
+
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            const error = new Error("Field Validation Failed")
+            error.statusCode = 422
+            error.source = errors.array()
+            throw error
+        }
+
         // get order payload
-        const { orderItems, totalPrice } = req.body;
+        const { orderItems, totalPrice } = matchedData(req) // req.body;
 
         // find the user
         const user = await User.findById(req.userAuthId)
@@ -129,7 +139,15 @@ export const getAllOrdersCtrl = expressAsyncHandler(
 export const getSingleOrderCtrl = expressAsyncHandler(
     async (req, res) => {
 
-        const id = req.params.id;
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            const error = new Error("Field Validation Failed")
+            error.statusCode = 422
+            error.source = errors.array()
+            throw error
+        }
+
+        const { id } = matchedData(req) // req.params.id;
         const orders = await Order.findById(id);
 
         if (!orders) {
@@ -151,13 +169,22 @@ export const getSingleOrderCtrl = expressAsyncHandler(
 //@access private/admin
 export const updateOrderCtrl = expressAsyncHandler(
     async (req, res) => {
+
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            const error = new Error("Field Validation Failed")
+            error.statusCode = 422
+            error.source = errors.array()
+            throw error
+        }
+
         // get id from params
-        const id = req.params.id;
+        const {id, status} = matchedData(req) // req.params.id;
 
         // update
         const updatedOrder = await Order.findByIdAndUpdate(
             id,
-            { status: req.body.status },
+            { status: status },
             { new: true },
         );
 

@@ -19,13 +19,29 @@ userRoutes.post(
 
 userRoutes.post(
     "/login",
-    checkExact([body('email').isEmail(), body('password').isLength({ min: 5 })], {
+    checkExact(
+        [body('email').isEmail(), body('password').isLength({ min: 5 })], {
         message: 'Too many fields specified',
     }),
     loginUserCtrl
 );
 
+userRoutes.put(
+    "/address",
+    checkExact([checkSchema({
+        firstName: {isString: true},
+        lastName: {isString: true},
+        address: {isString: true},
+        city: {isString: true},
+        postalCode: {isString: true},
+        province: {isString: true},
+        country: {isString: true},
+        phone: {isString: true}
+    }, ['body'])]),
+    isLoggedIn,
+    updateShippingAddressCtrl
+);
+
 userRoutes.get("/profile", isLoggedIn, getUserProfileCtrl);
-userRoutes.get("/address", isLoggedIn, updateShippingAddressCtrl);
 
 export default userRoutes;

@@ -107,7 +107,23 @@ export const getUserProfileCtrl = expressAsyncHandler(
 // @access Private
 export const updateShippingAddressCtrl = expressAsyncHandler(
     async (req, res) => {
-        const { firstName, lastName, address, city, postalCode, province, country, phone } = req.body;
+        
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            const error = new Error("Field Validation Failed")
+            error.statusCode = 422
+            error.source = errors.array()
+            throw error
+        }
+
+        const {firstName, 
+            lastName, 
+            address, 
+            city, 
+            postalCode, 
+            province, 
+            country, 
+            phone } = matchedData(req) // req.body;
 
         const user = await User.findByIdAndUpdate(req.userAuthId, {
             shippingAdress: {firstName, lastName, address, city, postalCode, province, country, phone},
