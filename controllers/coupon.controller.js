@@ -52,7 +52,7 @@ export const getAllCouponsCtrl = expressAsyncHandler(
 )
 
 // @desc Get single Coupon
-// @route GET /api/v1/coupons
+// @route GET /api/v1/coupons/:id
 // @access Private/Admin
 export const getCouponCtrl = expressAsyncHandler(
     async (req, res) => {
@@ -66,7 +66,9 @@ export const getCouponCtrl = expressAsyncHandler(
     }
 );
 
-
+// @desc Update Coupon
+// @route PUT /api/v1/coupons/update/:id
+// @access Private/Admin
 export const updateCouponCtrl = expressAsyncHandler(
     async (req, res) => {
         const { code, startDate, endDate, discount } = req.body;
@@ -86,7 +88,9 @@ export const updateCouponCtrl = expressAsyncHandler(
     }
 )
 
-
+// @desc Delete Coupon
+// @route DELETE /api/v1/coupons/delete/:id
+// @access Private/Admin
 export const deleteCouponCtrl = expressAsyncHandler(
     async (req, res) => {
         

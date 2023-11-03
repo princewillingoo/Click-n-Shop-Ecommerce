@@ -181,7 +181,7 @@ export const getSingleOrderCtrl = expressAsyncHandler(
     }
 )
 
-//@desc update order to status
+//@desc Update Order Status
 //@route PUT /api/v1/orders/update/:id
 //@access private/admin
 export const updateOrderCtrl = expressAsyncHandler(
