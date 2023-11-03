@@ -6,6 +6,7 @@ import axios from "axios";
 import dotenv from "dotenv";
 import crypto from "crypto"
 import { matchedData, validationResult } from "express-validator";
+import Coupon from "../models/model.coupon.js";
 
 dotenv.config()
 
@@ -24,7 +25,23 @@ export const createOrderCtrl = expressAsyncHandler(
         }
 
         // get order payload
-        const { orderItems, totalPrice } = matchedData(req) // req.body;
+        const { orderItems, totalPrice, coupon } = matchedData(req) // req.body;
+
+        let couponFound;
+        if (coupon) {
+            couponFound = await Coupon.findOne({
+                code: coupon?.toUpperCase(),
+            });
+            if (!couponFound) {
+                throw new Error('Invalid Coupon !!!')
+            }
+            if (couponFound?.isExpired) {
+                throw new Error('Invalid Coupon !!!')
+            }
+        }
+
+        // get discount 
+        const discount = couponFound?.discount / 100;
 
         // find the user
         const user = await User.findById(req.userAuthId)
@@ -48,7 +65,7 @@ export const createOrderCtrl = expressAsyncHandler(
             user: user?._id,
             orderItems,
             shippingAddress: user.shippingAdress,
-            totalPrice,
+            totalPrice: couponFound ? totalPrice - totalPrice * discount : totalPrice,
         });
 
         // update product quantity
@@ -74,7 +91,7 @@ export const createOrderCtrl = expressAsyncHandler(
         // Paystack checkout session data
         const sessionData = {
             email: user.email,
-            amount: parseInt(totalPrice),
+            amount: parseInt(order.totalPrice),
             callback_url: successUrl,
             metadata: JSON.stringify({
                 orderNumber: order.orderNumber,
@@ -179,7 +196,7 @@ export const updateOrderCtrl = expressAsyncHandler(
         }
 
         // get id from params
-        const {id, status} = matchedData(req) // req.params.id;
+        const { id, status } = matchedData(req) // req.params.id;
 
         // update
         const updatedOrder = await Order.findByIdAndUpdate(

@@ -10,7 +10,7 @@ import {
 } from "../controllers/order.controller.js"
 import { isLoggedIn } from "../middlewares/isLoggedIn.middleware.js";
 import cors from "cors"
-import { body, param } from "express-validator";
+import { body, param, query } from "express-validator";
 import { isValidObjectId } from "mongoose";
 
 const orderRouter = Router();
@@ -20,6 +20,7 @@ orderRouter.post(
     '/',
     body('orderItems', 'Invalid Order Items').isArray({ min: 1 }),
     body('totalPrice', 'Invalid Price Total').isInt({ min: 10, max: 5000 }),
+    query('coupon', 'Invalid Coupon').isString().optional(),
     isLoggedIn,
     createOrderCtrl
 )
