@@ -1,5 +1,6 @@
 import expressAsyncHandler from "express-async-handler";
 import Coupon from "../models/model.coupon.js";
+import { matchedData, validationResult } from "express-validator";
 
 
 // @desc Create new Coupon
@@ -7,7 +8,17 @@ import Coupon from "../models/model.coupon.js";
 // @access Private/Admin
 export const createCouponCtrl = expressAsyncHandler(
     async (req, res) => {
-        const { code, startDate, endDate, discount } = req.body;
+
+        // Schema Validation
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            let error = new Error("Field Validation Failed")
+            error.statusCode = 422
+            error.source = errors.array()
+            throw error
+        }
+
+        const { code, startDate, endDate, discount } = matchedData(req) // req.body;
         // check if admin
 
         // check if coupon exists
@@ -56,7 +67,19 @@ export const getAllCouponsCtrl = expressAsyncHandler(
 // @access Private/Admin
 export const getCouponCtrl = expressAsyncHandler(
     async (req, res) => {
-        const coupon = await Coupon.findById(req.params.id);
+
+        // Schema Validation
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            let error = new Error("Field Validation Failed")
+            error.statusCode = 422
+            error.source = errors.array()
+            throw error
+        }
+
+        const { id } = matchedData(req)
+
+        const coupon = await Coupon.findById(id);
 
         res.json({
             status: "success",
@@ -71,9 +94,19 @@ export const getCouponCtrl = expressAsyncHandler(
 // @access Private/Admin
 export const updateCouponCtrl = expressAsyncHandler(
     async (req, res) => {
-        const { code, startDate, endDate, discount } = req.body;
 
-        const coupon = await Coupon.findByIdAndUpdate(req.params.id, {
+        // Schema Validation
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            let error = new Error("Field Validation Failed")
+            error.statusCode = 422
+            error.source = errors.array()
+            throw error
+        }
+
+        const { id, code, startDate, endDate, discount } = matchedData(req) // req.body;
+
+        const coupon = await Coupon.findByIdAndUpdate(id, {
             code: code?.toUpperCase(),
             discount,
             startDate,
@@ -93,8 +126,19 @@ export const updateCouponCtrl = expressAsyncHandler(
 // @access Private/Admin
 export const deleteCouponCtrl = expressAsyncHandler(
     async (req, res) => {
-        
-        await Coupon.findByIdAndDelete(req.params.id);
+
+        // Schema Validation
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            let error = new Error("Field Validation Failed")
+            error.statusCode = 422
+            error.source = errors.array()
+            throw error
+        }
+
+        const { id } = matchedData(req)
+
+        await Coupon.findByIdAndDelete(id);
 
         res.status(204).json({
             status: "success",
