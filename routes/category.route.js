@@ -9,12 +9,13 @@ import {
 import { isLoggedIn } from "../middlewares/isLoggedIn.middleware.js"
 import { checkSchema, param } from "express-validator";
 import { isValidObjectId } from "mongoose";
-
+import parser from "../configs/fileUpload.config.js"
 
 const categoriesRouter = Router();
 
 categoriesRouter.post(
     "/", 
+    parser.single("file"),
     checkSchema({
         name: {isString: true, errorMessage: "name must be string type" },
     }, ["body"]),

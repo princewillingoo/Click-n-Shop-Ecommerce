@@ -34,6 +34,7 @@ export const createBrandCtrl = expressAsyncHandler(
 
             name: name.toLowerCase(),
             user: req.userAuthId,
+            image: req.file.path
         });
 
         res.status(201).json({

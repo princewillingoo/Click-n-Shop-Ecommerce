@@ -1,4 +1,5 @@
 import { Router } from "express";
+import parser from "../configs/fileUpload.config.js"
 import {
     createProductCtrl,
     getProductsCtrl,
@@ -10,11 +11,11 @@ import { isLoggedIn } from "../middlewares/isLoggedIn.middleware.js";
 import { checkSchema, param, query } from "express-validator";
 import { isValidObjectId } from "mongoose";
 
-
 const productRouter = Router();
 
 productRouter.post(
     "/",
+    parser.array('files'),
     checkSchema({
         name: { isString: true, errorMessage: "name must be string type" },
         description: { isString: true, errorMessage: "description must be string type" },

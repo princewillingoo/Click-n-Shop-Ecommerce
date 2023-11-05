@@ -21,7 +21,17 @@ export const createProductCtrl = expressAsyncHandler(
             throw error
         }
 
-        const { name, description, category, brand, sizes, colors, price, totalQty } = query(req)  // req.body;
+        const convertedImgs = req.files.map((file) => file.path);
+
+        const { 
+            name, 
+            description, 
+            category, 
+            brand, 
+            sizes, 
+            colors, 
+            price, 
+            totalQty } = matchedData(req) // req.body
 
         // Product exists
         const productExists = await Product.findOne({ name });
@@ -40,7 +50,7 @@ export const createProductCtrl = expressAsyncHandler(
         }
 
         //find the category
-        const categoryFound = await Category.findOne({ name: category, })
+        const categoryFound = await Category.findOne({ name: category.toLowerCase(), })
         if (!categoryFound) {
             let err = new Error("Category Not Found")
             err.statusCode = 404
@@ -58,6 +68,7 @@ export const createProductCtrl = expressAsyncHandler(
             user: req.userAuthId,
             price,
             totalQty,
+            images: convertedImgs
         });
 
         // Push the product into category
