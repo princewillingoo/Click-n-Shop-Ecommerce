@@ -4,6 +4,7 @@ import {
     getAllOrdersCtrl,
     getSingleOrderCtrl,
     updateOrderCtrl,
+    getOrderStatsCtrl,
     paymentCanceled,
     paymentSuccess,
     paymentWebHook
@@ -12,6 +13,7 @@ import { isLoggedIn } from "../middlewares/isLoggedIn.middleware.js";
 import cors from "cors"
 import { body, param, query } from "express-validator";
 import { isValidObjectId } from "mongoose";
+import isAdmin from "../middlewares/isAdmin.middleware.js";
 
 const orderRouter = Router();
 
@@ -45,7 +47,13 @@ orderRouter.put(
         }
     }),
     isLoggedIn,
+    isAdmin,
     updateOrderCtrl
+)
+orderRouter.get('/sales/stats',
+    isLoggedIn,
+    isAdmin,
+    getOrderStatsCtrl
 )
 
 orderRouter.get('/payment/success', paymentSuccess)

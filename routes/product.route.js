@@ -10,6 +10,7 @@ import {
 import { isLoggedIn } from "../middlewares/isLoggedIn.middleware.js";
 import { checkSchema, param, query } from "express-validator";
 import { isValidObjectId } from "mongoose";
+import isAdmin from "../middlewares/isAdmin.middleware.js";
 
 const productRouter = Router();
 
@@ -27,6 +28,7 @@ productRouter.post(
         totalQty: { isInt: { options: { min: 3 } }, errorMessage: "quanity must be integer type" }
     }, ["body"]),
     isLoggedIn,
+    isAdmin,
     createProductCtrl
 );
 
@@ -34,7 +36,7 @@ productRouter.get(
     "/", 
     query(["name", "brand", "category", "colors", 
     "sizes", "price", "page", "limit"]).isString().optional(),
-    getProductsCtrl
+    getProductsCtrl,
 );
 
 productRouter.get(
@@ -61,6 +63,7 @@ productRouter.put(
         totalQty: { isInt: { options: { min: 3 } }, errorMessage: "quanity must be integer type" }
     }, ["body"]),
     isLoggedIn,
+    isAdmin,
     updateProductCtrl
 );
 
@@ -70,6 +73,7 @@ productRouter.delete(
         return isValidObjectId(value)
     }),
     isLoggedIn,
+    isAdmin,
     deleteProductCtrl
 );
 

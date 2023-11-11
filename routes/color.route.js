@@ -9,6 +9,7 @@ import {
 import { isLoggedIn } from "../middlewares/isLoggedIn.middleware.js"
 import { checkSchema, param } from "express-validator";
 import { isValidObjectId } from "mongoose";
+import isAdmin from "../middlewares/isAdmin.middleware.js";
 
 const colorsRouter = Router();
 
@@ -18,6 +19,8 @@ colorsRouter.post(
         name: {isString: true, errorMessage: "name must be string type" },
     }, ["body"]),
     isLoggedIn, 
+    isLoggedIn,
+    isAdmin,
     createColorCtrl
 );
 
@@ -39,7 +42,8 @@ colorsRouter.put(
     checkSchema({
         name: {isString: true, errorMessage: "name must be string type" },
     }, ["body"]),
-    isLoggedIn, 
+    isLoggedIn,
+    isAdmin, 
     updateColorCtrl
 );
 
@@ -48,7 +52,8 @@ colorsRouter.delete(
     param("id", "Invalid Path Paramater").custom(value => {
         return isValidObjectId(value)
     }),
-    isLoggedIn,  
+    isLoggedIn,
+    isAdmin,  
     deleteColorCtrl
 );
 

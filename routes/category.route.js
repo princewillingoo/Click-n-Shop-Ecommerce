@@ -10,6 +10,7 @@ import { isLoggedIn } from "../middlewares/isLoggedIn.middleware.js"
 import { checkSchema, param } from "express-validator";
 import { isValidObjectId } from "mongoose";
 import parser from "../configs/fileUpload.config.js"
+import isAdmin from "../middlewares/isAdmin.middleware.js";
 
 const categoriesRouter = Router();
 
@@ -19,7 +20,8 @@ categoriesRouter.post(
     checkSchema({
         name: {isString: true, errorMessage: "name must be string type" },
     }, ["body"]),
-    isLoggedIn, 
+    isLoggedIn,
+    isAdmin, 
     createCategoryCtrl
 );
 
@@ -41,7 +43,8 @@ categoriesRouter.put(
     checkSchema({
         name: {isString: true, errorMessage: "name must be string type" },
     }, ["body"]),
-    isLoggedIn, 
+    isLoggedIn,
+    isAdmin, 
     updateCategoryCtrl
 );
 
@@ -50,7 +53,8 @@ categoriesRouter.delete(
     param("id", "Invalid Path Paramater").custom(value => {
         return isValidObjectId(value)
     }),
-    isLoggedIn, 
+    isLoggedIn,
+    isAdmin, 
     deleteCategoryCtrl
 );
 

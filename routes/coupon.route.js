@@ -3,6 +3,7 @@ import { createCouponCtrl, deleteCouponCtrl, getAllCouponsCtrl, getCouponCtrl, u
 import { isLoggedIn } from "../middlewares/isLoggedIn.middleware.js";
 import { checkExact, checkSchema, param } from "express-validator";
 import { isValidObjectId } from "mongoose";
+import isAdmin from "../middlewares/isAdmin.middleware.js";
 
 const couponRouter = Router();
 
@@ -14,7 +15,8 @@ couponRouter.post(
         startDate: {isDate: true},
         endDate: {isDate: true},
     }, ['body'])]),
-    isLoggedIn, 
+    isLoggedIn,
+    isAdmin, 
     createCouponCtrl
 );
 
@@ -39,6 +41,8 @@ couponRouter.put(
         startDate: {isDate: true},
         endDate: {isDate: true},
     }, ['body'])]),
+    isLoggedIn,
+    isAdmin,
     updateCouponCtrl
 )
 
@@ -47,6 +51,8 @@ couponRouter.delete(
     param("id", "Invalid Path Paramater").custom(value => {
         return isValidObjectId(value)
     }),
+    isLoggedIn,
+    isAdmin,
     deleteCouponCtrl
 )
 
