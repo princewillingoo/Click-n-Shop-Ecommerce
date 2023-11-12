@@ -42,10 +42,14 @@ export const registerUserCtrl = expressAsyncHandler(
             email,
             password: hashedPassword,
         });
+
+        const newUser = { ...user.toObject() };
+        delete newUser.password;
+
         res.status(201).json({
             status: "success",
             message: "User Registered Successfully",
-            data: user,
+            data: newUser,
         })
     }
 )
