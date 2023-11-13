@@ -96,7 +96,7 @@ export const loginUserCtrl = expressAsyncHandler(
 // @access Private
 export const getUserProfileCtrl = expressAsyncHandler(
     async (req, res) => {
-        const user = await User.findById(req.userAuthId).populate("orders");
+        const user = await User.findById(req.userAuthId).populate(["orders", "wishLists"]);
 
         res.json({
             status: "success",

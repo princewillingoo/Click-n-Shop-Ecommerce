@@ -24,7 +24,7 @@ const UserSchema = new Schema({
     wishLists: [
         {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "WhisList",
+            ref: "Product",
         },
     ],
     isAdmin: {
