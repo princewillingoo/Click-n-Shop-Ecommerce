@@ -11,6 +11,7 @@ import reviewRouter from '../routes/review.route.js';
 import orderRouter from '../routes/order.route.js';
 import couponRouter from '../routes/coupon.route.js';
 import wishlistRoutes from '../routes/wishlist.route.js';
+import path from 'node:path';
 
 // Environments
 dotenv.config()
@@ -23,7 +24,13 @@ const app = express();
 // parse incoming data
 app.use(express.json())
 
+app.use(express.static('public'))
+
 // routes
+app.get('/', (req, res) => {
+    res.sendFile(path.join('public', 'index.html'))
+})
+
 app.use("/api/v1/users/", userRoutes);
 app.use("/api/v1/products/", productRouter);
 app.use("/api/v1/categories/", categoriesRouter);
